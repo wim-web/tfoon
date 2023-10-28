@@ -8,18 +8,18 @@ import (
 	"os"
 	"strings"
 
-	tfhoon "github.com/wim-web/tfoon"
+	"github.com/wim-web/tfoon/pkg/moddep"
 )
 
-func TreesPresenter() func(tfhoon.ModuleTreeList) (string, error) {
-	return func(trees tfhoon.ModuleTreeList) (string, error) {
+func TreesPresenter() func(moddep.ModuleTreeList) (string, error) {
+	return func(trees moddep.ModuleTreeList) (string, error) {
 		b, err := json.Marshal(trees)
 		return string(b), err
 	}
 }
 
-func M2ePresenter() func(tfhoon.Module2EntryPoint) (string, error) {
-	return func(m2e tfhoon.Module2EntryPoint) (string, error) {
+func M2ePresenter() func(moddep.Module2EntryPoint) (string, error) {
+	return func(m2e moddep.Module2EntryPoint) (string, error) {
 		b, err := json.Marshal(m2e)
 		return string(b), err
 	}
@@ -54,7 +54,7 @@ func main() {
 }
 
 func getOutput(paths []string, m2eMode bool, logger *slog.Logger) (string, error) {
-	trees, err := tfhoon.FromPaths(paths)
+	trees, err := moddep.FromPaths(paths)
 	if err != nil {
 		return "", err
 	}

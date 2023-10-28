@@ -1,4 +1,4 @@
-package tfhoon_test
+package moddep_test
 
 import (
 	"os"
@@ -6,12 +6,12 @@ import (
 	"reflect"
 	"testing"
 
-	tfhoon "github.com/wim-web/tfoon"
+	"github.com/wim-web/tfoon/pkg/moddep"
 )
 
 func testdataDir() string {
 	c, _ := os.Getwd()
-	return path.Join(c, "./testdata")
+	return path.Join(c, "../../testdata")
 }
 
 func TestFromPath(t *testing.T) {
@@ -39,7 +39,7 @@ func TestFromPath(t *testing.T) {
 
 		for _, tc := range testCases {
 			t.Run(tc.name, func(t *testing.T) {
-				tree, err := tfhoon.FromPath(tc.path)
+				tree, err := moddep.FromPath(tc.path)
 
 				if err != nil {
 					t.Error(err)
@@ -55,7 +55,7 @@ func TestFromPath(t *testing.T) {
 	// caller3はmodules/noopを呼び出している
 	// caller3のModuleTreeのChildrenにはModuleTree{Path: "modules/noop"}が含まれていることを確認する
 	t.Run("assert children", func(t *testing.T) {
-		tree, err := tfhoon.FromPath(path.Join(testdataDir(), "terraform/caller3"))
+		tree, err := moddep.FromPath(path.Join(testdataDir(), "terraform/caller3"))
 		if err != nil {
 			t.Error(err)
 		}
@@ -102,7 +102,7 @@ func TestFromPaths(t *testing.T) {
 
 		for _, tc := range testCases {
 			t.Run(tc.name, func(t *testing.T) {
-				list, err := tfhoon.FromPaths(tc.paths)
+				list, err := moddep.FromPaths(tc.paths)
 
 				if err != nil {
 					t.Error(err)
@@ -118,7 +118,7 @@ func TestFromPaths(t *testing.T) {
 
 // To2ModuleEntryPointはModuleTreeListをModule2EntryPointに変換する
 func TestToModule2EntryPoint(t *testing.T) {
-	tree, err := tfhoon.FromPaths([]string{
+	tree, err := moddep.FromPaths([]string{
 		path.Join(testdataDir(), "terraform/caller3"),
 	})
 	if err != nil {

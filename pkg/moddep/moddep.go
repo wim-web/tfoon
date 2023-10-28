@@ -1,4 +1,4 @@
-package tfhoon
+package moddep
 
 import (
 	"fmt"
