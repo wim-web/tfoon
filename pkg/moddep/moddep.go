@@ -82,10 +82,22 @@ func toModule2EntryPoint(mt ModuleTree) (Module2EntryPoint, error) {
 		return nil, fmt.Errorf("This module is not entry point")
 	}
 
-	m2e := make(Module2EntryPoint)
+	// [modulePath] = Set([entryPointPath])
+	m := map[string]map[string]struct{}{}
 
 	for _, ps := range getChildrenPaths(mt.Children) {
-		m2e[ps] = append(m2e[ps], mt.Path)
+		m[ps] = map[string]struct{}{
+			mt.Path: {},
+		}
+	}
+
+	m2e := make(Module2EntryPoint)
+
+	for modulePath, entryPoints := range m {
+		m2e[modulePath] = []string{}
+		for entryPoint := range entryPoints {
+			m2e[modulePath] = append(m2e[modulePath], entryPoint)
+		}
 	}
 
 	return m2e, nil

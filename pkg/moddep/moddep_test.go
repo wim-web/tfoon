@@ -118,22 +118,42 @@ func TestFromPaths(t *testing.T) {
 
 // To2ModuleEntryPointはModuleTreeListをModule2EntryPointに変換する
 func TestToModule2EntryPoint(t *testing.T) {
-	tree, err := moddep.FromPaths([]string{
-		path.Join(testdataDir(), "terraform/caller3"),
-	})
-	if err != nil {
-		t.Error(err)
+	type testCase struct {
+		name     string
+		paths    []string
+		expected moddep.Module2EntryPoint
 	}
 
-	m2p := tree.ToModule2EntryPoint()
+	testCases := []testCase{
+		{
+			name:  "single module",
+			paths: []string{path.Join(testdataDir(), "terraform/caller3")},
+			expected: moddep.Module2EntryPoint{
+				path.Join(testdataDir(), "terraform/modules/noop"): {path.Join(testdataDir(), "terraform/caller3")},
+			},
+		},
+		{
+			name:  "same 2 module",
+			paths: []string{path.Join(testdataDir(), "terraform/caller4")},
+			expected: map[string][]string{
+				path.Join(testdataDir(), "terraform/modules/noop"): {path.Join(testdataDir(), "terraform/caller4")},
+			},
+		},
+	}
 
-	// caller3はterraform/modules/noopを呼び出しているので
-	// terraform/modules/noop => [terraform/caller3]が返ってくることを確認する
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			list, err := moddep.FromPaths(tc.paths)
 
-	actual := m2p[path.Join(testdataDir(), "terraform/modules/noop")]
-	expected := []string{path.Join(testdataDir(), "terraform/caller3")}
+			if err != nil {
+				t.Error(err)
+			}
 
-	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("%v, want %v", actual, expected)
+			m2p := list.ToModule2EntryPoint()
+
+			if !reflect.DeepEqual(m2p, tc.expected) {
+				t.Errorf("%v, want %v", m2p, tc.expected)
+			}
+		})
 	}
 }
