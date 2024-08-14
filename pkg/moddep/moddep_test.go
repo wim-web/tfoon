@@ -35,6 +35,11 @@ func TestFromPath(t *testing.T) {
 				path:     path.Join(testdataDir(), "terraform/caller1"),
 				expected: path.Join(testdataDir(), "terraform/caller1"),
 			},
+			{
+				name:     "include remote module",
+				path:     path.Join(testdataDir(), "terraform/remote_caller"),
+				expected: path.Join(testdataDir(), "terraform/remote_caller"),
+			},
 		}
 
 		for _, tc := range testCases {
