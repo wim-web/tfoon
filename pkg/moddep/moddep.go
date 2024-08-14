@@ -3,6 +3,7 @@ package moddep
 import (
 	"fmt"
 	"path"
+	"strings"
 
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 )
@@ -20,6 +21,10 @@ func (mt ModuleTree) isEntryPoint() bool {
 	return mt.Parent == nil
 }
 
+func isLocalModule(m *tfconfig.ModuleCall) bool {
+	return strings.HasPrefix(m.Source, "./") || strings.HasPrefix(m.Source, "../")
+}
+
 func newModuleTree(module *tfconfig.Module) (ModuleTree, tfconfig.Diagnostics) {
 	var diags tfconfig.Diagnostics
 	tree := ModuleTree{
@@ -29,6 +34,10 @@ func newModuleTree(module *tfconfig.Module) (ModuleTree, tfconfig.Diagnostics) {
 	}
 
 	for _, child := range module.ModuleCalls {
+		if !isLocalModule(child) {
+			continue
+		}
+
 		childPath := path.Join(module.Path, child.Source)
 		moduleOfChild, diags := tfconfig.LoadModule(childPath)
 		if diags.HasErrors() {
